@@ -4,6 +4,7 @@ var carSpeedX = 0, carSpeedY = 0;
 var targetSpeedX = 0, targetSpeedY = 0;
 var timer = 0, timerInterval, startTime = Date.now();
 var transitionSpeed = 0.2;
+var lastDirection = null;
 
 window.onload = function() {
   canvas = document.getElementById('gameCanvas');
@@ -18,10 +19,10 @@ window.onload = function() {
 
 function keyDownHandler(e) {
   switch(e.keyCode) {
-    case 37: targetSpeedX = -6; break;
-    case 38: targetSpeedY = -6; break;
-    case 39: targetSpeedX = 6; break;
-    case 40: targetSpeedY = 6; break;
+    case 37: targetSpeedX = -8; break;
+    case 38: targetSpeedY = -8; break;
+    case 39: targetSpeedX = 8; break;
+    case 40: targetSpeedY = 8; break;
   }
 }
 
@@ -48,6 +49,68 @@ function updateAll() {
 
   // Appliquer l'accélération ou la décélération en fonction de la direction
   var currentAcceleration = (targetSpeedX === 0 || targetSpeedY === 0) ? 1.10 : 1.05;
+  var currentDeceleration = 0.99;
+
+  if (targetSpeedX !== 0 && targetSpeedY !== 0) {
+    carSpeedX *= currentDeceleration;
+    carSpeedY *= currentDeceleration;
+  } else {
+    carSpeedX *= currentAcceleration;
+    carSpeedY *= currentAcceleration;
+  }
+
+  
+  // Calculer la vitesse totale pour déterminer si la voiture est en ligne droite ou en virage
+  var totalSpeed = Math.sqrt(carSpeedX * carSpeedX + carSpeedY * carSpeedY);
+
+  // Appliquer l'accélération ou la décélération en fonction de la direction
+  var currentAcceleration = 1 + Math.log(1 + totalSpeed) / 100; // Formule logarithmique
+  var currentDeceleration = 0.99;
+
+  // Déterminer la direction actuelle
+  var currentDirection = '';
+  if (targetSpeedX > 0) currentDirection += 'R';
+  if (targetSpeedX < 0) currentDirection += 'L';
+  if (targetSpeedY > 0) currentDirection += 'D';
+  if (targetSpeedY < 0) currentDirection += 'U';
+
+  // Vérifier si la voiture est en train de tourner
+  var isTurning = lastDirection && lastDirection !== currentDirection;
+
+  if (isTurning) {
+    carSpeedX *= currentDeceleration;
+    carSpeedY *= currentDeceleration;
+  } else {
+    carSpeedX *= currentAcceleration;
+    carSpeedY *= currentAcceleration;
+  }
+
+  // Mettre à jour la dernière direction
+  lastDirection = currentDirection;
+
+   // Calculer la vitesse totale pour déterminer si la voiture est en ligne droite ou en virage
+  var totalSpeed = Math.sqrt(carSpeedX * carSpeedX + carSpeedY * carSpeedY);
+
+  // Appliquer l'accélération ou la décélération en fonction de la direction
+  var currentAcceleration = 1 + Math.log(1 + totalSpeed) / 100; // Formule logarithmique
+  var currentDeceleration = 0.99;
+
+  // Vérifier si la voiture est en train de tourner
+  var isTurning = targetSpeedX !== 0 && targetSpeedY !== 0;
+
+  if (isTurning) {
+    carSpeedX *= currentDeceleration;
+    carSpeedY *= currentDeceleration;
+  } else {
+    carSpeedX *= currentAcceleration;
+    carSpeedY *= currentAcceleration;
+  }
+
+   // Calculer la vitesse totale pour déterminer si la voiture est en ligne droite ou en virage
+  var totalSpeed = Math.sqrt(carSpeedX * carSpeedX + carSpeedY * carSpeedY);
+
+  // Appliquer l'accélération ou la décélération en fonction de la direction
+  var currentAcceleration = 1 + Math.log(1 + totalSpeed) / 100; // Formule logarithmique
   var currentDeceleration = 0.99;
 
   if (targetSpeedX !== 0 && targetSpeedY !== 0) {
