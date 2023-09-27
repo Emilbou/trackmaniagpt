@@ -195,6 +195,33 @@ for (let plate of boostPlates) {
   }
 }
 
+// Dans updateAll
+for (let obstacle of obstacles) {
+  if (carX < obstacle.x + obstacle.width &&
+      carX + 50 > obstacle.x &&
+      carY < obstacle.y + obstacle.height &&
+      carY + 25 > obstacle.y) {
+    // Collision détectée
+    if (carSpeedX > 0 && carX < obstacle.x) { // Se déplace vers la droite
+      carX = obstacle.x - 50;
+      carSpeedX *= -0.5;
+    } else if (carSpeedX < 0 && carX + 50 > obstacle.x + obstacle.width) { // Se déplace vers la gauche
+      carX = obstacle.x + obstacle.width;
+      carSpeedX *= -0.5;
+    }
+    if (carSpeedY > 0 && carY < obstacle.y) { // Se déplace vers le bas
+      carY = obstacle.y - 25;
+      carSpeedY *= -0.5;
+    } else if (carSpeedY < 0 && carY + 25 > obstacle.y + obstacle.height) { // Se déplace vers le haut
+      carY = obstacle.y + obstacle.height;
+      carSpeedY *= -0.5;
+    }
+  }
+}
+
+
+
+
 
   drawAll();
 }
