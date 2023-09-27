@@ -74,26 +74,12 @@ function updateAll() {
   if (targetSpeedY > 0) currentDirection += 'D';
   if (targetSpeedY < 0) currentDirection += 'U';
 
-  // Vérifier si la voiture est en train de tourner
-  var isTurning = lastDirection && lastDirection !== currentDirection;
 
-  if (isTurning) {
-    carSpeedX *= currentDeceleration;
-    carSpeedY *= currentDeceleration;
-  } else {
-    carSpeedX *= currentAcceleration;
-    carSpeedY *= currentAcceleration;
-  }
+
 
   // Mettre à jour la dernière direction
   lastDirection = currentDirection;
 
-   // Calculer la vitesse totale pour déterminer si la voiture est en ligne droite ou en virage
-  var totalSpeed = Math.sqrt(carSpeedX * carSpeedX + carSpeedY * carSpeedY);
-
-  // Appliquer l'accélération ou la décélération en fonction de la direction
-  var currentAcceleration = 1 + Math.log(1 + totalSpeed) / 100; // Formule logarithmique
-  var currentDeceleration = 0.99;
 
   // Vérifier si la voiture est en train de tourner
   var isTurning = targetSpeedX !== 0 && targetSpeedY !== 0;
@@ -112,6 +98,22 @@ function updateAll() {
   // Appliquer l'accélération ou la décélération en fonction de la direction
   var currentAcceleration = 1 + Math.log(1 + totalSpeed) / 100; // Formule logarithmique
   var currentDeceleration = 0.99;
+
+//pour l'accélération diagonale
+
+var isDiagonal = targetSpeedX !== 0 && targetSpeedY !== 0;
+  var isTurning = lastDirection && lastDirection !== currentDirection;
+
+  if (isDiagonal) {
+    carSpeedX *= currentAcceleration;
+    carSpeedY *= currentAcceleration;
+  } else if (isTurning) {
+    carSpeedX *= currentDeceleration;
+    carSpeedY *= currentDeceleration;
+  } else {
+    carSpeedX *= currentAcceleration;
+    carSpeedY *= currentAcceleration;
+  }
 
   if (targetSpeedX !== 0 && targetSpeedY !== 0) {
     carSpeedX *= currentDeceleration;
