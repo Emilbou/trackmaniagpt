@@ -12,9 +12,11 @@ var obstacles = [
   // Ajoutez d'autres obstacles ici
 ];
 var checkpoints = [
-  { x: 200, y: 200, width: 50, height: 50, cleared: false },
+  { x: 200, y: 200, width: 50, height: 50, cleared: false, order: 1 },
+  { x: 600, y: 600, width: 50, height: 50, cleared: false, order: 2 },
   // Ajoutez d'autres checkpoints ici
 ];
+
 
 var finishLine = { x: 300, y: 300, width: 50, height: 50 };
 var boostPlates = [
@@ -183,16 +185,24 @@ for (let obstacle of obstacles) {
   }
 }
 
+
+
 // Dans updateAll
+var nextCheckpointOrder = Math.min(...checkpoints.filter(cp => !cp.cleared).map(cp => cp.order));
+
 for (let checkpoint of checkpoints) {
   if (carX < checkpoint.x + checkpoint.width &&
       carX + 50 > checkpoint.x &&
       carY < checkpoint.y + checkpoint.height &&
       carY + 25 > checkpoint.y) {
     // Checkpoint franchi
-    checkpoint.cleared = true;
+    if (checkpoint.order === nextCheckpointOrder) {
+      checkpoint.cleared = true;
+    }
   }
 }
+
+
 
 // Dans updateAll
 var allCheckpointsCleared = checkpoints.every(cp => cp.cleared);
