@@ -38,19 +38,42 @@ window.onload = function() {
 
 function keyDownHandler(e) {
   switch(e.keyCode) {
-    case 37: targetSpeedX = -8; break;
-    case 38: targetSpeedY = -8; break;
-    case 39: targetSpeedX = 8; break;
-    case 40: targetSpeedY = 8; break;
+    case 37: // gauche
+    case 81: // Q
+      targetSpeedX = -8;
+      break;
+    case 38: // haut
+    case 90: // Z
+      targetSpeedY = -8;
+      break;
+    case 39: // droite
+    case 68: // D
+      targetSpeedX = 8;
+      break;
+    case 40: // bas
+    case 83: // S
+      targetSpeedY = 8;
+      break;
   }
 }
 
 function keyUpHandler(e) {
   switch(e.keyCode) {
-    case 37: case 39: targetSpeedX = 0; break;
-    case 38: case 40: targetSpeedY = 0; break;
+    case 37: // gauche
+    case 39: // droite
+    case 81: // Q
+    case 68: // D
+      targetSpeedX = 0;
+      break;
+    case 38: // haut
+    case 40: // bas
+    case 90: // Z
+    case 83: // S
+      targetSpeedY = 0;
+      break;
   }
 }
+
 
 function updateTimer() {
   timer = (Date.now() - startTime) / 10;
