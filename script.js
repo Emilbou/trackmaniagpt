@@ -1,22 +1,10 @@
-var canvas;
-var canvasContext;
-var carX = 50;
-var carY = 50;
-var carSpeedX = 2;
-var carSpeedY = 1;
-var acceleration = 1.05;
-var timer = 0;
-var timerInterval;
-var accelerating = false;
-var startTime = Date.now();
-var walls = [
-  { x: 100, y: 0, w: 10, h: 300 },
-  { x: 200, y: 300, w: 10, h: 300 },
-  { x: 300, y: 0, w: 10, h: 300 },
-  { x: 400, y: 300, w: 10, h: 300 }
-];
-
-
+var canvas, canvasContext;
+var carX = 50, carY = 50;
+var carSpeedX = 0, carSpeedY = 0;
+var targetSpeedX = 0, targetSpeedY = 0;
+var acceleration = 1.10; // Augmentation du facteur d'accélération
+var timer = 0, timerInterval, startTime = Date.now();
+var transitionSpeed = 0.2;
 
 window.onload = function() {
   canvas = document.getElementById('gameCanvas');
@@ -24,59 +12,45 @@ window.onload = function() {
   canvas.height = window.innerHeight;
   canvasContext = canvas.getContext('2d');
   document.addEventListener('keydown', keyDownHandler);
+  document.addEventListener('keyup', keyUpHandler);
   timerInterval = setInterval(updateTimer, 10);
   setInterval(updateAll, 50);
 }
 
-
-var targetSpeedX = 0;
-var targetSpeedY = 0;
-var friction = 0.9;
-var turningSpeed = 0.1;
-
 function keyDownHandler(e) {
-    accelerating = true;
   switch(e.keyCode) {
-    case 37: // Left arrow
-      targetSpeedX = -2;
-      break;
-    case 38: // Up arrow
-      targetSpeedY = -2;
-      break;
-    case 39: // Right arrow
-      targetSpeedX = 2;
-      break;
-    case 40: // Down arrow
-      targetSpeedY = 2;
-      break;
+    case 37: targetSpeedX = -4; break;
+    case 38: targetSpeedY = -4; break;
+    case 39: targetSpeedX = 4; break;
+    case 40: targetSpeedY = 4; break;
   }
 }
 
+function keyUpHandler(e) {
+  switch(e.keyCode) {
+    case 37: case 39: targetSpeedX = 0; break;
+    case 38: case 40: targetSpeedY = 0; break;
+  }
+}
 
 function updateTimer() {
   timer = (Date.now() - startTime) / 10;
 }
 
-    function updateAll() {
+function updateAll() {
+  carSpeedX += (targetSpeedX - carSpeedX) * transitionSpeed;
+  carSpeedY += (targetSpeedY - carSpeedY) * transitionSpeed;
+
   carX += carSpeedX;
   carY += carSpeedY;
 
-if (accelerating) {
+  // Apply acceleration
+  if (targetSpeedX !== 0 || targetSpeedY !== 0) {
     carSpeedX *= acceleration;
     carSpeedY *= acceleration;
-  } else {
-    // Apply "drift" effect
-    carSpeedX += (targetSpeedX - carSpeedX) * turningSpeed;
-    carSpeedY += (targetSpeedY - carSpeedY) * turningSpeed;
-
-    // Apply friction
-    carSpeedX *= friction;
-    carSpeedY *= friction;
   }
 
-  accelerating = false;
-
-  // Empêcher la voiture de dépasser les bords de l'écran
+  // Prevent the car from going off-screen
   if (carX < 0) {
     carX = 0;
     carSpeedX *= 0.5;
@@ -93,63 +67,15 @@ if (accelerating) {
     carY = canvas.height - 25;
     carSpeedY *= 0.5;
   }
-    var hitWall = false;
-
-    // Check for wall collision
-    walls.forEach(function(wall) {
-        if (carX < wall.x + wall.w &&
-            carX + 50 > wall.x &&
-            carY < wall.y + wall.h &&
-            carY + 25 > wall.y) {
-        carSpeedX *= 0.5;
-        carSpeedY *= 0.5;
-        hitWall = true;
-        }
-    });
-
-  if (!hitWall) {
-    carSpeedX *= acceleration;
-    carSpeedY *= acceleration;
-  }
 
   drawAll();
- // Apply "drift" effect
-  carSpeedX += (targetSpeedX - carSpeedX) * turningSpeed;
-  carSpeedY += (targetSpeedY - carSpeedY) * turningSpeed;
-
-  // Apply friction
-  carSpeedX *= friction;
-  carSpeedY *= friction;
-
-  // Apply acceleration
-  if (carSpeedX !== 0 || carSpeedY !== 0) {
-    currentAcceleration *= acceleration;
-  } else {
-    currentAcceleration = 1;
-  }
-
-  carX += carSpeedX * currentAcceleration;
-  carY += carSpeedY * currentAcceleration;
-
-
 }
 
 function drawAll() {
-  // Draw background
   canvasContext.fillStyle = 'black';
   canvasContext.fillRect(0, 0, canvas.width, canvas.height);
-
-  // Draw walls
-  canvasContext.fillStyle = 'grey';
-  walls.forEach(function(wall) {
-    canvasContext.fillRect(wall.x, wall.y, wall.w, wall.h);
-  });
-
-  // Draw car
   canvasContext.fillStyle = 'white';
   canvasContext.fillRect(carX, carY, 50, 25);
-
-  // Draw timer
   canvasContext.fillStyle = 'white';
   canvasContext.font = '20px Arial';
   canvasContext.fillText('Time: ' + timer / 100 + 's', 10, 20);
