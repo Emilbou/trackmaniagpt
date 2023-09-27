@@ -2,7 +2,6 @@ var canvas, canvasContext;
 var carX = 50, carY = 50;
 var carSpeedX = 0, carSpeedY = 0;
 var targetSpeedX = 0, targetSpeedY = 0;
-var acceleration = 1.10; // Augmentation du facteur d'accélération
 var timer = 0, timerInterval, startTime = Date.now();
 var transitionSpeed = 0.2;
 
@@ -19,10 +18,10 @@ window.onload = function() {
 
 function keyDownHandler(e) {
   switch(e.keyCode) {
-    case 37: targetSpeedX = -4; break;
-    case 38: targetSpeedY = -4; break;
-    case 39: targetSpeedX = 4; break;
-    case 40: targetSpeedY = 4; break;
+    case 37: targetSpeedX = -6; break;
+    case 38: targetSpeedY = -6; break;
+    case 39: targetSpeedX = 6; break;
+    case 40: targetSpeedY = 6; break;
   }
 }
 
@@ -44,10 +43,19 @@ function updateAll() {
   carX += carSpeedX;
   carY += carSpeedY;
 
-  // Apply acceleration
-  if (targetSpeedX !== 0 || targetSpeedY !== 0) {
-    carSpeedX *= acceleration;
-    carSpeedY *= acceleration;
+  // Calculer la vitesse totale pour déterminer si la voiture est en ligne droite ou en virage
+  var totalSpeed = Math.sqrt(carSpeedX * carSpeedX + carSpeedY * carSpeedY);
+
+  // Appliquer l'accélération ou la décélération en fonction de la direction
+  var currentAcceleration = (targetSpeedX === 0 || targetSpeedY === 0) ? 1.10 : 1.05;
+  var currentDeceleration = 0.99;
+
+  if (targetSpeedX !== 0 && targetSpeedY !== 0) {
+    carSpeedX *= currentDeceleration;
+    carSpeedY *= currentDeceleration;
+  } else {
+    carSpeedX *= currentAcceleration;
+    carSpeedY *= currentAcceleration;
   }
 
   // Prevent the car from going off-screen
@@ -76,7 +84,14 @@ function drawAll() {
   canvasContext.fillRect(0, 0, canvas.width, canvas.height);
   canvasContext.fillStyle = 'white';
   canvasContext.fillRect(carX, carY, 50, 25);
+  
+  // Afficher le timer en haut à gauche
   canvasContext.fillStyle = 'white';
   canvasContext.font = '20px Arial';
   canvasContext.fillText('Time: ' + timer / 100 + 's', 10, 20);
+  
+  // Calculer et afficher la vitesse en haut à droite
+  var speed = Math.sqrt(carSpeedX * carSpeedX + carSpeedY * carSpeedY);
+  speed = Math.round(speed * 100) / 100; // Arrondir à deux décimales
+  canvasContext.fillText('Speed: ' + speed + ' px/s', canvas.width - 150, 20);
 }
