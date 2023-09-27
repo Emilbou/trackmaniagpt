@@ -5,6 +5,8 @@ var targetSpeedX = 0, targetSpeedY = 0;
 var timer = 0, timerInterval, startTime = Date.now();
 var transitionSpeed = 0.2;
 var lastDirection = null;
+var carImage;
+
 
 window.onload = function() {
   canvas = document.getElementById('gameCanvas');
@@ -15,6 +17,8 @@ window.onload = function() {
   document.addEventListener('keyup', keyUpHandler);
   timerInterval = setInterval(updateTimer, 10);
   setInterval(updateAll, 50);
+  carImage = new Image();
+  carImage.src = 'assets/voiture.png';
 }
 
 function keyDownHandler(e) {
@@ -38,34 +42,44 @@ function updateTimer() {
 }
 
 function updateAll() {
+  var isDiagonal = targetSpeedX !== 0 && targetSpeedY !== 0;
+
+  // Update speed based on target and transition
   carSpeedX += (targetSpeedX - carSpeedX) * transitionSpeed;
   carSpeedY += (targetSpeedY - carSpeedY) * transitionSpeed;
 
+  // Normalize diagonal speed
+  if (isDiagonal) {
+    carSpeedX /= Math.sqrt(2);
+    carSpeedY /= Math.sqrt(2);
+  }
+
+  // Calculate total speed for determining straight line or turn
+  var totalSpeed = Math.sqrt(carSpeedX * carSpeedX + carSpeedY * carSpeedY);
+
+  // Apply acceleration or deceleration based on direction
+  var currentAcceleration = 1.02 + Math.log(1 + totalSpeed) / 50;
+  var currentDeceleration = 0.99;
+
+  if (targetSpeedX !== 0 || targetSpeedY !== 0) {
+    carSpeedX *= currentAcceleration;
+    carSpeedY *= currentAcceleration;
+  } else {
+    carSpeedX *= currentDeceleration;
+    carSpeedY *= currentDeceleration;
+  }
+
+  // Re-normalize diagonal speed after applying acceleration or deceleration
+  if (isDiagonal) {
+    carSpeedX *= Math.sqrt(2);
+    carSpeedY *= Math.sqrt(2);
+  }
+
+  // Update car position
   carX += carSpeedX;
   carY += carSpeedY;
 
-  // Calculer la vitesse totale pour déterminer si la voiture est en ligne droite ou en virage
-  var totalSpeed = Math.sqrt(carSpeedX * carSpeedX + carSpeedY * carSpeedY);
 
-  // Appliquer l'accélération ou la décélération en fonction de la direction
-  var currentAcceleration = (targetSpeedX === 0 || targetSpeedY === 0) ? 1.10 : 1.05;
-  var currentDeceleration = 0.99;
-
-  if (targetSpeedX !== 0 && targetSpeedY !== 0) {
-    carSpeedX *= currentDeceleration;
-    carSpeedY *= currentDeceleration;
-  } else {
-    carSpeedX *= currentAcceleration;
-    carSpeedY *= currentAcceleration;
-  }
-
-  
-  // Calculer la vitesse totale pour déterminer si la voiture est en ligne droite ou en virage
-  var totalSpeed = Math.sqrt(carSpeedX * carSpeedX + carSpeedY * carSpeedY);
-
-  // Appliquer l'accélération ou la décélération en fonction de la direction
-  var currentAcceleration = 1 + Math.log(1 + totalSpeed) / 100; // Formule logarithmique
-  var currentDeceleration = 0.99;
 
   // Déterminer la direction actuelle
   var currentDirection = '';
@@ -79,42 +93,7 @@ function updateAll() {
 
   // Mettre à jour la dernière direction
   lastDirection = currentDirection;
-
-
-  // Vérifier si la voiture est en train de tourner
-  var isTurning = targetSpeedX !== 0 && targetSpeedY !== 0;
-
-  if (isTurning) {
-    carSpeedX *= currentDeceleration;
-    carSpeedY *= currentDeceleration;
-  } else {
-    carSpeedX *= currentAcceleration;
-    carSpeedY *= currentAcceleration;
-  }
-
-   // Calculer la vitesse totale pour déterminer si la voiture est en ligne droite ou en virage
-  var totalSpeed = Math.sqrt(carSpeedX * carSpeedX + carSpeedY * carSpeedY);
-
-  // Appliquer l'accélération ou la décélération en fonction de la direction
-  var currentAcceleration = 1 + Math.log(1 + totalSpeed) / 100; // Formule logarithmique
-  var currentDeceleration = 0.99;
-
-//pour l'accélération diagonale
-
-var isDiagonal = targetSpeedX !== 0 && targetSpeedY !== 0;
-  var isTurning = lastDirection && lastDirection !== currentDirection;
-
-  if (isDiagonal) {
-    carSpeedX *= currentAcceleration;
-    carSpeedY *= currentAcceleration;
-  } else if (isTurning) {
-    carSpeedX *= currentDeceleration;
-    carSpeedY *= currentDeceleration;
-  } else {
-    carSpeedX *= currentAcceleration;
-    carSpeedY *= currentAcceleration;
-  }
-
+  
   if (targetSpeedX !== 0 && targetSpeedY !== 0) {
     carSpeedX *= currentDeceleration;
     carSpeedY *= currentDeceleration;
@@ -122,6 +101,14 @@ var isDiagonal = targetSpeedX !== 0 && targetSpeedY !== 0;
     carSpeedX *= currentAcceleration;
     carSpeedY *= currentAcceleration;
   }
+
+  // Vérifier si la voiture est en train de tourner
+  var isTurning = targetSpeedX !== 0 && targetSpeedY !== 0;
+
+
+
+
+
 
   // Prevent the car from going off-screen
   if (carX < 0) {
@@ -148,7 +135,24 @@ function drawAll() {
   canvasContext.fillStyle = 'black';
   canvasContext.fillRect(0, 0, canvas.width, canvas.height);
   canvasContext.fillStyle = 'white';
-  canvasContext.fillRect(carX, carY, 50, 25);
+ // Calculer l'angle de rotation en radians
+  var angle = Math.atan2(carSpeedY, carSpeedX);
+  
+  // Sauvegarder l'état actuel du contexte
+  canvasContext.save();
+  
+  // Translatez le contexte à la position de la voiture
+  canvasContext.translate(carX + 25, carY + 12.5); // 25 et 12.5 sont la moitié de la largeur et de la hauteur de la voiture
+  
+  // Appliquer la rotation
+  canvasContext.rotate(angle);
+  
+  // Dessiner l'image de la voiture
+  canvasContext.drawImage(carImage, -25, -12.5, 100, 50); // Dessiner l'image de manière à ce que son centre soit à l'origine
+  
+  // Restaurer l'état du contexte
+  canvasContext.restore();
+
   
   // Afficher le timer en haut à gauche
   canvasContext.fillStyle = 'white';
