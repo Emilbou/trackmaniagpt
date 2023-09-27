@@ -30,8 +30,8 @@ var obstacles = [
 var checkpoints = [
   { x: 1490, y: 750, width: 15, height: 150, cleared: false, order: 1 },
   { x: 1490, y: 0, width: 15, height: 150, cleared: false, order: 4},
-  { x: 0, y: 160, width: 200, height: 15, cleared: false, order: 2 },
-  { x: 0, y: 710, width: 200, height: 15, cleared: false, order: 3 },
+  { x: 0, y: 160, width: 200, height: 15, cleared: false, order: 3 },
+  { x: 0, y: 710, width: 200, height: 15, cleared: false, order: 2 },
   // Ajoutez d'autres checkpoints ici
 ];
 
