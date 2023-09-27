@@ -1,5 +1,5 @@
 var canvas, canvasContext;
-var carX = 50, carY = 50;
+var carX = 830, carY = 50;
 var carSpeedX = 0, carSpeedY = 0;
 var targetSpeedX = 0, targetSpeedY = 0;
 var timer = 0, timerInterval, startTime = Date.now();
@@ -8,19 +8,37 @@ var lastDirection = null;
 var carImage;
 var angle;
 var obstacles = [
-  { x: 400, y: 100, width: 50, height: 500 },
+  { x: 200, y: 160, width: 350, height: 2 }, // Haut
+  { x: 200, y: 160, width: 2, height: 250 }, // Gauche
+  { x: 550, y: 160, width: 2, height: 250 }, // Droite
+  { x: 200, y: 410, width: 350, height: 2 }, // Bas
+  { x: 0, y: 560, width: 600, height: 2 }, // Sol
+  { x: 200, y: 720, width: 400, height: 2 },
+  { x: 600, y: 720, width: 2, height: 60 },
+  { x: 770, y: 0, width: 2, height: 250 },
+  { x: 770, y: 750, width: 2, height: 200 },
+  { x: 1000, y: 0, width: 2, height: 300 },
+  { x: 1100, y: 720, width: 400, height: 2 },
+  { x: 1500, y: 660, width: 2, height: 60 },
+  { x: 1500, y: 160, width: 2, height: 340 },
+  { x: 1300, y: 160, width: 200, height: 2 },
+  { x: 1152, y: 500, width: 350, height: 2 },
+  { x: 1000, y: 310, width: 230, height: 2 },
+
   // Ajoutez d'autres obstacles ici
 ];
 var checkpoints = [
-  { x: 200, y: 200, width: 50, height: 50, cleared: false, order: 1 },
-  { x: 600, y: 600, width: 50, height: 50, cleared: false, order: 2 },
+  { x: 1490, y: 750, width: 15, height: 150, cleared: false, order: 1 },
+  { x: 1490, y: 0, width: 15, height: 150, cleared: false, order: 4},
+  { x: 0, y: 160, width: 200, height: 15, cleared: false, order: 2 },
+  { x: 0, y: 710, width: 200, height: 15, cleared: false, order: 3 },
   // Ajoutez d'autres checkpoints ici
 ];
 
-
-var finishLine = { x: 300, y: 300, width: 50, height: 50 };
+var finishLine = { x: 1670, y: 520, width: 50, height: 120 };
 var boostPlates = [
-  { x: 1000, y: 300, width: 50, height: 50 },
+  { x: 1145, y: 315, width: 15, height: 170 },
+  { x: 585, y: 570, width: 15, height: 140 },
   // Ajoutez d'autres plaques de boost ici
 ];
 
