@@ -17,6 +17,10 @@ var checkpoints = [
 ];
 
 var finishLine = { x: 300, y: 300, width: 50, height: 50 };
+var boostPlates = [
+  { x: 1000, y: 300, width: 50, height: 50 },
+  // Ajoutez d'autres plaques de boost ici
+];
 
 
 window.onload = function() {
@@ -179,6 +183,18 @@ if (allCheckpointsCleared &&
   alert("Félicitations ! Vous avez terminé en " + (timer / 100) + " secondes.");
 }
 
+// Dans updateAll
+for (let plate of boostPlates) {
+  if (carX < plate.x + plate.width &&
+      carX + 50 > plate.x &&
+      carY < plate.y + plate.height &&
+      carY + 25 > plate.y) {
+    // Plaque de boost franchie
+    carSpeedX *= 1.5;
+    carSpeedY *= 1.5;
+  }
+}
+
 
   drawAll();
 }
@@ -236,6 +252,12 @@ canvasContext.fillRect(finishLine.x, finishLine.y, finishLine.width, finishLine.
 for (let checkpoint of checkpoints) {
   canvasContext.fillStyle = checkpoint.cleared ? 'gray' : 'yellow';
   canvasContext.fillRect(checkpoint.x, checkpoint.y, checkpoint.width, checkpoint.height);
+}
+
+// Dans drawAll
+canvasContext.fillStyle = 'blue';
+for (let plate of boostPlates) {
+  canvasContext.fillRect(plate.x, plate.y, plate.width, plate.height);
 }
 
 }
