@@ -6,6 +6,17 @@ var timer = 0, timerInterval, startTime = Date.now();
 var transitionSpeed = 0.2;
 var lastDirection = null;
 var carImage;
+var angle;
+var obstacles = [
+  { x: 400, y: 100, width: 50, height: 500 },
+  // Ajoutez d'autres obstacles ici
+];
+var checkpoints = [
+  { x: 200, y: 200, width: 50, height: 50, cleared: false },
+  // Ajoutez d'autres checkpoints ici
+];
+
+var finishLine = { x: 300, y: 300, width: 50, height: 50 };
 
 
 window.onload = function() {
@@ -55,8 +66,12 @@ function updateAll() {
   }
 
   // Calculate total speed for determining straight line or turn
-  var totalSpeed = Math.sqrt(carSpeedX * carSpeedX + carSpeedY * carSpeedY);
-
+ // Dans updateAll
+var totalSpeed = Math.sqrt(carSpeedX * carSpeedX + carSpeedY * carSpeedY);
+var angle = 0; // angle par défaut
+if (totalSpeed > 100) { // Remplacez 1 par la vitesse minimale à laquelle la voiture peut tourner
+  angle = Math.atan2(carSpeedY, carSpeedX);
+}
   // Apply acceleration or deceleration based on direction
   var currentAcceleration = 1.02 + Math.log(1 + totalSpeed) / 50;
   var currentDeceleration = 0.99;
@@ -110,6 +125,7 @@ function updateAll() {
 
 
 
+
   // Prevent the car from going off-screen
   if (carX < 0) {
     carX = 0;
@@ -127,6 +143,42 @@ function updateAll() {
     carY = canvas.height - 25;
     carSpeedY *= 0.5;
   }
+
+// Dans updateAll
+for (let obstacle of obstacles) {
+  if (carX < obstacle.x + obstacle.width &&
+      carX + 50 > obstacle.x &&
+      carY < obstacle.y + obstacle.height &&
+      carY + 25 > obstacle.y) {
+    // Collision détectée, réagissez en conséquence
+    carSpeedX *= -0.5;
+    carSpeedY *= -0.5;
+  }
+}
+
+// Dans updateAll
+for (let checkpoint of checkpoints) {
+  if (carX < checkpoint.x + checkpoint.width &&
+      carX + 50 > checkpoint.x &&
+      carY < checkpoint.y + checkpoint.height &&
+      carY + 25 > checkpoint.y) {
+    // Checkpoint franchi
+    checkpoint.cleared = true;
+  }
+}
+
+// Dans updateAll
+var allCheckpointsCleared = checkpoints.every(cp => cp.cleared);
+if (allCheckpointsCleared &&
+    carX < finishLine.x + finishLine.width &&
+    carX + 50 > finishLine.x &&
+    carY < finishLine.y + finishLine.height &&
+    carY + 25 > finishLine.y) {
+  // Arrêt du timer et affichage du temps
+  clearInterval(timerInterval);
+  alert("Félicitations ! Vous avez terminé en " + (timer / 100) + " secondes.");
+}
+
 
   drawAll();
 }
@@ -154,6 +206,7 @@ function drawAll() {
   canvasContext.restore();
 
   
+  
   // Afficher le timer en haut à gauche
   canvasContext.fillStyle = 'white';
   canvasContext.font = '20px Arial';
@@ -163,4 +216,26 @@ function drawAll() {
   var speed = Math.sqrt(carSpeedX * carSpeedX + carSpeedY * carSpeedY);
   speed = Math.round(speed * 100) / 100; // Arrondir à deux décimales
   canvasContext.fillText('Speed: ' + speed + ' px/s', canvas.width - 150, 20);
+
+  // Dans drawAll
+// Dessiner les obstacles
+canvasContext.fillStyle = 'red';
+for (let obstacle of obstacles) {
+  canvasContext.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+}
+// Dessiner les checkpoints
+canvasContext.fillStyle = 'yellow';
+for (let checkpoint of checkpoints) {
+  canvasContext.fillRect(checkpoint.x, checkpoint.y, checkpoint.width, checkpoint.height);
+}
+// Dessiner la ligne d'arrivée
+canvasContext.fillStyle = 'green';
+canvasContext.fillRect(finishLine.x, finishLine.y, finishLine.width, finishLine.height);
+
+// Dans drawAll
+for (let checkpoint of checkpoints) {
+  canvasContext.fillStyle = checkpoint.cleared ? 'gray' : 'yellow';
+  canvasContext.fillRect(checkpoint.x, checkpoint.y, checkpoint.width, checkpoint.height);
+}
+
 }
