@@ -1,4 +1,7 @@
 var canvas, canvasContext;
+var countdown = 3; // Compte à rebours initial
+var gameStarted = false; // État du jeu
+
 var carX = 830, carY = 50;
 var carSpeedX = 0, carSpeedY = 0;
 var targetSpeedX = 0, targetSpeedY = 0;
@@ -54,9 +57,11 @@ window.onload = function() {
   setInterval(updateAll, 50);
   carImage = new Image();
   carImage.src = 'assets/voiture.png';
+  startCountdown();
 }
 
 function keyDownHandler(e) {
+  if (!gameStarted) return;
   switch(e.keyCode) {
     case 37: // gauche
     case 81: // Q
@@ -78,6 +83,7 @@ function keyDownHandler(e) {
 }
 
 function keyUpHandler(e) {
+  if (!gameStarted) return;
   switch(e.keyCode) {
     case 37: // gauche
     case 39: // droite
@@ -96,8 +102,11 @@ function keyUpHandler(e) {
 
 
 function updateTimer() {
-  timer = (Date.now() - startTime) / 10;
+  if (gameStarted) {
+    timer = (Date.now() - startTime) / 10;
+  }
 }
+
 
 function updateAll() {
   var isDiagonal = targetSpeedX !== 0 && targetSpeedY !== 0;
@@ -337,5 +346,22 @@ canvasContext.fillStyle = 'blue';
 for (let plate of boostPlates) {
   canvasContext.fillRect(plate.x, plate.y, plate.width, plate.height);
 }
+ if (!gameStarted) {
+    canvasContext.fillStyle = 'white';
+    canvasContext.font = '50px Arial';
+    canvasContext.fillText(countdown, canvas.width / 2, canvas.height / 2);
+  }
+}
 
+function startCountdown() {
+  var countdownInterval = setInterval(function() {
+    if (countdown > 0) {
+      console.log(countdown); // ou affichez-le sur le canvas
+      countdown--;
+    } else {
+      clearInterval(countdownInterval);
+      gameStarted = true; // Démarrez le jeu
+      startTime = Date.now(); // Démarrez le timer
+    }
+  }, 1000);
 }
