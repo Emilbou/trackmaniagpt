@@ -1,14 +1,77 @@
 <!DOCTYPE html>
 <html>
-
-<head>
+  <head>
     <title>Simple Racing Game</title>
-    <link rel="stylesheet" type="text/css" href="styles.css">
-</head>
+    <link rel="stylesheet" type="text/css" href="styles.css" />
+  </head>
 
-<body>
-    <canvas id="gameCanvas" width="800" height="600"></canvas>
+  <body>
+    <div class="container">
+      <div class="items-joystick" id="up"></div>
+      <div class="items-joystick" id="down"></div>
+      <div class="items-joystick" id="left"></div>
+      <div class="items-joystick" id="right"></div>
+    </div>
+
+    <canvas id="gameCanvas" width="100vw" height="100svh"> </canvas>
+
     <script src="script.js"></script>
-</body>
+  </body>
 
+  <style>
+    .container {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-rows: 1fr 1fr 1fr;
+      width: 200px;
+      height: 200px;
+      visibility: hidden;
+    }
+    .items-joystick {
+      background-color: #fff;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      z-index: 50;
+    }
+    @media (max-width: 900px) {
+      .container {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-rows: 1fr 1fr 1fr;
+        width: 200px;
+        height: 200px;
+        visibility: visible;
+      }
+      .items-joystick {
+        background-color: #fff;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        z-index: 50;
+      }
+      #up {
+        grid-column: 2;
+        grid-row: 1;
+      }
+      #down {
+        grid-column: 2;
+        grid-row: 3;
+      }
+      #left {
+        grid-column: 1;
+        grid-row: 2;
+      }
+      #right {
+        grid-column: 3;
+        grid-row: 2;
+      }
+    }
+  </style>
 </html>

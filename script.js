@@ -45,6 +45,27 @@ var boostPlates = [
   // Ajoutez d'autres plaques de boost ici
 ];
 
+var ramps = [
+  { x: 800, y: 400, width: 50, height: 50, inAir: false }
+];
+
+
+// Détection de collision avec le tramplin
+for (let ramp of ramps) {
+  if (carX < ramp.x + ramp.width &&
+      carX + 50 > ramp.x &&
+      carY < ramp.y + ramp.height &&
+      carY + 25 > ramp.y) {
+    // Appliquer une décélération moins importante
+    carSpeedX *= 0.8;
+    carSpeedY *= 0.8;
+
+    // Mettre la voiture en l'air
+    ramp.inAir = true;
+  }
+}
+
+
 
 window.onload = function() {
   canvas = document.getElementById('gameCanvas');
@@ -58,6 +79,7 @@ window.onload = function() {
   carImage = new Image();
   carImage.src = 'assets/voiture.png';
   startCountdown();
+setupButtonControls();
 }
 
 function keyDownHandler(e) {
@@ -100,6 +122,40 @@ function keyUpHandler(e) {
   }
 }
 
+function handleButtonPress(buttonId) {
+  if (!gameStarted) return;
+  switch(buttonId) {
+    case 'left': // Bouton gauche
+      targetSpeedX = -8;
+      break;
+    case 'up': // Bouton haut
+      targetSpeedY = -8;
+      break;
+    case 'right': // Bouton droite
+      targetSpeedX = 8;
+      break;
+    case 'down': // Bouton bas
+      targetSpeedY = 8;
+      break;
+  }
+}
+
+function setupButtonControls() {
+  var buttons = ['up', 'down', 'left', 'right'];
+  buttons.forEach(buttonId => {
+    var button = document.getElementById(buttonId);
+    button.addEventListener('mousedown', () => handleButtonPress(buttonId));
+    button.addEventListener('mouseup', () => resetTargetSpeed());
+    button.addEventListener('touchstart', (e) => { e.preventDefault(); handleButtonPress(buttonId); }, false);
+    button.addEventListener('touchend', (e) => { e.preventDefault(); resetTargetSpeed(); }, false);
+  });
+}
+
+function resetTargetSpeed() {
+  targetSpeedX = 0;
+  targetSpeedY = 0;
+}
+
 
 function updateTimer() {
   if (gameStarted) {
@@ -121,15 +177,13 @@ function updateAll() {
     carSpeedY /= Math.sqrt(2);
   }
 
-  // Calculate total speed for determining straight line or turn
- // Dans updateAll
 var totalSpeed = Math.sqrt(carSpeedX * carSpeedX + carSpeedY * carSpeedY);
 var angle = 0; // angle par défaut
 if (totalSpeed > 100) { // Remplacez 1 par la vitesse minimale à laquelle la voiture peut tourner
   angle = Math.atan2(carSpeedY, carSpeedX);
 }
   // Apply acceleration or deceleration based on direction
-  var currentAcceleration = 1.02 + Math.log(1 + totalSpeed) / 50;
+  var currentAcceleration = 1.029 + Math.log(1 + totalSpeed) / 50;
   var currentDeceleration = 0.99;
 
   if (targetSpeedX !== 0 || targetSpeedY !== 0) {
@@ -200,21 +254,31 @@ if (totalSpeed > 100) { // Remplacez 1 par la vitesse minimale à laquelle la vo
     carSpeedY *= 0.5;
   }
 
-// Dans updateAll
 for (let obstacle of obstacles) {
   if (carX < obstacle.x + obstacle.width &&
       carX + 50 > obstacle.x &&
       carY < obstacle.y + obstacle.height &&
       carY + 25 > obstacle.y) {
-    // Collision détectée, réagissez en conséquence
-    carSpeedX *= -0.5;
-    carSpeedY *= -0.5;
+    // Collision détectée
+    if (carSpeedX > 0 && carX < obstacle.x) { // Se déplace vers la droite
+      carX = obstacle.x - 50;
+      carSpeedX = 0; // Arrêtez la voiture en réinitialisant la vitesse
+    } else if (carSpeedX < 0 && carX + 50 > obstacle.x + obstacle.width) { // Se déplace vers la gauche
+      carX = obstacle.x + obstacle.width;
+      carSpeedX = 0; // Arrêtez la voiture
+    }
+    if (carSpeedY > 0 && carY < obstacle.y) { // Se déplace vers le bas
+      carY = obstacle.y - 25;
+      carSpeedY = 0; // Arrêtez la voiture
+    } else if (carSpeedY < 0 && carY + 25 > obstacle.y + obstacle.height) { // Se déplace vers le haut
+      carY = obstacle.y + obstacle.height;
+      carSpeedY = 0; // Arrêtez la voiture
+    }
   }
 }
 
 
 
-// Dans updateAll
 var nextCheckpointOrder = Math.min(...checkpoints.filter(cp => !cp.cleared).map(cp => cp.order));
 
 for (let checkpoint of checkpoints) {
@@ -231,7 +295,6 @@ for (let checkpoint of checkpoints) {
 
 
 
-// Dans updateAll
 var allCheckpointsCleared = checkpoints.every(cp => cp.cleared);
 if (allCheckpointsCleared &&
     carX < finishLine.x + finishLine.width &&
@@ -243,7 +306,6 @@ if (allCheckpointsCleared &&
   alert("Félicitations ! Vous avez terminé en " + (timer / 100) + " secondes.");
 }
 
-// Dans updateAll
 for (let plate of boostPlates) {
   if (carX < plate.x + plate.width &&
       carX + 50 > plate.x &&
@@ -281,7 +343,56 @@ for (let obstacle of obstacles) {
 
 
 
+ for (let ramp of ramps) {
+    if (carX < ramp.x + ramp.width &&
+        carX + 50 > ramp.x &&
+        carY < ramp.y + ramp.height &&
+        carY + 25 > ramp.y) {
+      // Appliquer la décélération
+      carSpeedX *= 0.5;
+      carSpeedY *= 0.5;
 
+      // Mettre la voiture en l'air
+      ramp.inAir = true;
+    }
+  }
+
+  for (let ramp of ramps) {
+    if (ramp.inAir) {
+      // La durée du saut est proportionnelle à la vitesse
+      var jumpDuration = Math.sqrt(carSpeedX * carSpeedX + carSpeedY * carSpeedY);
+
+      // TODO: Ajouter le code pour gérer le saut et l'atterrissage
+    }
+  }
+
+  // Dans updateAll
+for (let ramp of ramps) {
+  if (carX < ramp.x + ramp.width &&
+      carX + 50 > ramp.x &&
+      carY < ramp.y + ramp.height &&
+      carY + 25 > ramp.y) {
+    // Appliquer la décélération
+    carSpeedX *= 0.5;
+    carSpeedY *= 0.5;
+
+    // Mettre la voiture en l'air
+    ramp.inAir = true;
+  }
+}
+
+// Vérifier si la voiture est en contact avec le sol
+var onGround = obstacles.some(obstacle => {
+  return carX < obstacle.x + obstacle.width &&
+         carX + 50 > obstacle.x &&
+         carY < obstacle.y + obstacle.height &&
+         carY + 25 > obstacle.y;
+});
+
+// Si la voiture est en contact avec le sol, réinitialiser l'état inAir
+if (onGround) {
+  ramps.forEach(ramp => ramp.inAir = false);
+}
 
   drawAll();
 }
@@ -302,8 +413,7 @@ function drawAll() {
   // Appliquer la rotation
   canvasContext.rotate(angle);
   
-  // Dessiner l'image de la voiture
-  canvasContext.drawImage(carImage, -25, -12.5, 100, 50); // Dessiner l'image de manière à ce que son centre soit à l'origine
+
   
   // Restaurer l'état du contexte
   canvasContext.restore();
@@ -318,7 +428,7 @@ function drawAll() {
   // Calculer et afficher la vitesse en haut à droite
   var speed = Math.sqrt(carSpeedX * carSpeedX + carSpeedY * carSpeedY);
   speed = Math.round(speed * 100) / 100; // Arrondir à deux décimales
-  canvasContext.fillText('Speed: ' + speed + ' px/s', canvas.width - 150, 20);
+  canvasContext.fillText('Speed: ' + speed + ' px/s', canvas.width -10, 20);
 
   // Dans drawAll
 // Dessiner les obstacles
@@ -351,7 +461,39 @@ for (let plate of boostPlates) {
     canvasContext.font = '50px Arial';
     canvasContext.fillText(countdown, canvas.width / 2, canvas.height / 2);
   }
+
+
+   // Dessiner le tramplin
+  canvasContext.fillStyle = 'purple';
+  for (let ramp of ramps) {
+    canvasContext.fillRect(ramp.x, ramp.y, ramp.width, ramp.height);
+  }
+
+// Calculer l'angle de rotation en radians
+  var angle = Math.atan2(carSpeedY, carSpeedX);
+
+  // Sauvegarder l'état actuel du contexte
+  canvasContext.save();
+
+  // Translatez le contexte à la position de la voiture
+  canvasContext.translate(carX + 25, carY + 12.5);
+
+  // Appliquer la rotation
+  canvasContext.rotate(angle);
+
+// Vérifier si la voiture est en l'air
+var inAir = ramps.some(ramp => ramp.inAir);
+
+// Ajuster la taille de la voiture si elle est en l'air
+var scale = inAir ? 1.5 : 1;
+
+// Dessiner l'image de la voiture
+canvasContext.drawImage(carImage, -25 * scale, -12.5 * scale, 50 * scale, 25 * scale);
+  // Restaurer l'état du contexte
+  canvasContext.restore();
+
 }
+
 
 function startCountdown() {
   var countdownInterval = setInterval(function() {
