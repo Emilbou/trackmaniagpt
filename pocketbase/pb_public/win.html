@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Game over</title>
+    <script src="pocketbase.umd.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", (event) => {
+        const score = localStorage.getItem("bestTime") || 0;
+        document.getElementById("scoreValue").value = score;
+        document.getElementById("scoreDisplay").textContent =
+          "bestTime: " + score;
+      });
+
+      const pb = new PocketBase("https://trashmania.eboucard.fr/");
+      async function submitScore() {
+        const name = document.getElementById("playerName").value;
+        const score = document.getElementById("scoreValue").value;
+        const data = {
+          Nom_joueur: name,
+          player_score: score,
+        };
+        try {
+          const record = await pb.collection("display_score").create(data);
+          console.log(record);
+        } catch (error) {
+          console.error("Erreur lors de l'envoi du score:", error);
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <h1>Game over</h1>
+    <div id="scoreDisplay"></div>
+    <div class="text-center">
+      <input type="text" id="playerName" placeholder="Votre nom" />
+      <input type="hidden" id="scoreValue" />
+      <button class="text-center" onclick="submitScore()">
+        Enregistrer le score
+      </button>
+    </div>
+  </body>
+</html>

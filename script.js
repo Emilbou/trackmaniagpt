@@ -1,6 +1,10 @@
+
 var canvas, canvasContext;
 var countdown = 3; // Compte à rebours initial
 var gameStarted = false; // État du jeu
+var imagesLoaded = 0;
+var totalImages = 1; // Mettez à jour ce nombre en fonction du nombre total d'images
+
 
 var carX = 830, carY = 50;
 var carSpeedX = 0, carSpeedY = 0;
@@ -11,25 +15,48 @@ var lastDirection = null;
 var carImage;
 var angle;
 var obstacles = [
-  { x: 200, y: 160, width: 350, height: 2 }, // Haut
-  { x: 200, y: 160, width: 2, height: 250 }, // Gauche
-  { x: 550, y: 160, width: 2, height: 250 }, // Droite
-  { x: 200, y: 410, width: 350, height: 2 }, // Bas
-  { x: 0, y: 560, width: 600, height: 2 }, // Sol
-  { x: 200, y: 720, width: 400, height: 2 },
-  { x: 600, y: 720, width: 2, height: 60 },
-  { x: 770, y: 0, width: 2, height: 250 },
-  { x: 770, y: 750, width: 2, height: 200 },
-  { x: 1000, y: 0, width: 2, height: 300 },
-  { x: 1100, y: 720, width: 400, height: 2 },
-  { x: 1500, y: 660, width: 2, height: 60 },
-  { x: 1500, y: 160, width: 2, height: 340 },
-  { x: 1300, y: 160, width: 200, height: 2 },
-  { x: 1152, y: 500, width: 350, height: 2 },
-  { x: 1000, y: 310, width: 230, height: 2 },
+  { x: 200, y: 160, width: 350, height: 10 }, // Haut
+  { x: 200, y: 160, width: 10, height: 250 }, // Gauche
+  { x: 550, y: 160, width: 10, height: 250 }, // Droite
+  { x: 200, y: 410, width: 350, height: 10 }, // Bas
+  { x: 0, y: 560, width: 600, height: 10 }, // Sol
+  { x: 200, y: 720, width: 400, height: 10 },
+  { x: 600, y: 720, width: 10, height: 60 },
+  { x: 770, y: 0, width: 10, height: 250 },
+  { x: 770, y: 750, width: 10, height: 200 },
+  { x: 1000, y: 0, width: 10, height: 300 },
+  { x: 1100, y: 720, width: 400, height: 10 },
+  { x: 1500, y: 660, width: 10, height: 60 },
+  { x: 1500, y: 160, width: 10, height: 340 },
+  { x: 1300, y: 160, width: 200, height: 10 },
+  { x: 1152, y: 500, width: 350, height: 10 },
+  { x: 1000, y: 310, width: 230, height: 10 },
 
   // Ajoutez d'autres obstacles ici
 ];
+var obstacleTexture = new Image();
+obstacleTexture.src = 'assets/textures/theWall.png';
+
+// Assurez-vous que votre canvas est correctement sélectionné et que le contexte 2D est initialisé
+var canvas = document.getElementById('gameCanvas'); // Remplacez 'yourCanvasId' par l'ID de votre élément canvas
+var canvasContext = canvas.getContext('2d');
+
+
+
+obstacleTexture.onload = function() {
+  // Créer le motif uniquement après le chargement complet de l'image
+  var pattern = canvasContext.createPattern(obstacleTexture, 'repeat');
+
+  obstacles.forEach(function(obstacle) {
+    // Appliquer le motif
+    canvasContext.fillStyle = pattern;
+    canvasContext.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+  });
+};
+
+// Assurez-vous que le reste de votre code qui interagit avec le canvasContext se trouve après l'initialisation de celui-ci.
+
+
 var checkpoints = [
   { x: 1490, y: 750, width: 15, height: 150, cleared: false, order: 1 },
   { x: 1490, y: 0, width: 15, height: 150, cleared: false, order: 2},
@@ -303,7 +330,8 @@ if (allCheckpointsCleared &&
     carY + 25 > finishLine.y) {
   // Arrêt du timer et affichage du temps
   clearInterval(timerInterval);
-  alert("Félicitations ! Vous avez terminé en " + (timer / 100) + " secondes.");
+  localStorage.setItem('bestTime', timer/100);
+  window.location.href = 'win.html';
 }
 
 for (let plate of boostPlates) {
@@ -401,40 +429,29 @@ function drawAll() {
   canvasContext.fillStyle = 'black';
   canvasContext.fillRect(0, 0, canvas.width, canvas.height);
   canvasContext.fillStyle = 'white';
- // Calculer l'angle de rotation en radians
+
   var angle = Math.atan2(carSpeedY, carSpeedX);
   
-  // Sauvegarder l'état actuel du contexte
+
   canvasContext.save();
   
-  // Translatez le contexte à la position de la voiture
-  canvasContext.translate(carX + 25, carY + 12.5); // 25 et 12.5 sont la moitié de la largeur et de la hauteur de la voiture
-  
-  // Appliquer la rotation
+  canvasContext.translate(carX + 25, carY + 12.5); 
   canvasContext.rotate(angle);
   
 
-  
-  // Restaurer l'état du contexte
   canvasContext.restore();
 
   
-  
-  // Afficher le timer en haut à gauche
   canvasContext.fillStyle = 'white';
   canvasContext.font = '20px Arial';
   canvasContext.fillText('Time: ' + timer / 100 + 's', 10, 20);
   
-  // Calculer et afficher la vitesse en haut à droite
   var speed = Math.sqrt(carSpeedX * carSpeedX + carSpeedY * carSpeedY);
   speed = Math.round(speed * 100) / 100; // Arrondir à deux décimales
   canvasContext.fillText('Speed: ' + speed + ' px/s', canvas.width -10, 20);
 
-  // Dans drawAll
-// Dessiner les obstacles
-canvasContext.fillStyle = 'red';
 for (let obstacle of obstacles) {
-  canvasContext.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+  canvasContext.drawImage(obstacleTexture, obstacle.x, obstacle.y, obstacle.width, obstacle.height);
 }
 // Dessiner les checkpoints
 canvasContext.fillStyle = 'yellow';

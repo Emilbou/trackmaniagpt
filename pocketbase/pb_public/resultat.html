@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>rank</title>
+    <script src="pocketbase.umd.js"></script>
+  </head>
+  <body>
+    <h1>SCORE</h1>
+    <h2>Challenge your friends !</h2>
+    <div id="score"></div>
+    <script>
+      const pocketbase_ip = "https://trashmania.eboucard.fr/";
+      const pb = new PocketBase(pocketbase_ip);
+      async function allScore() {
+        let records = await pb.collection("display_score").getFullList();
+        records.sort((a, b) => b.score - a.score);
+        console.log(records);
+        return records;
+      }
+      async function displayScore() {
+        const records = await allScore();
+        let score = document.getElementById("score");
+        let i = 0;
+        for (i = 0; i < records.length; i++) {
+          let div = document.createElement("div");
+          div.innerHTML =
+            records[i].Nom_joueur + " : " + records[i].player_score;
+          score.appendChild(div);
+        }
+      }
+      displayScore();
+    </script>
+  </body>
+</html>

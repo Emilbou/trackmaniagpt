@@ -1,77 +1,163 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <title>Simple Racing Game</title>
-    <link rel="stylesheet" type="text/css" href="styles.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
   </head>
-
   <body>
-    <div class="container">
-      <div class="items-joystick" id="up"></div>
-      <div class="items-joystick" id="down"></div>
-      <div class="items-joystick" id="left"></div>
-      <div class="items-joystick" id="right"></div>
+    <div class="header">
+      <img src="" alt="Logo" />
+      <div>Best Score</div>
     </div>
-
-    <canvas id="gameCanvas" width="100vw" height="100svh"> </canvas>
-
-    <script src="script.js"></script>
+    <div class="main-content">
+      <div>
+        <h1>Trashmania</h1>
+        <div class="text">
+          <p>
+            Trashmania: DBR1 Edition" is a fast-paced, arcade-style racing game
+            that combines the classic charm of the Aston Martin DBR1 with
+            adrenaline-fueled track challenges.
+          </p>
+          <p>
+            Players navigate through creatively designed courses, each
+            presenting unique obstacles and exciting gameplay mechanics, all
+            while driving a beautifully rendered model of the iconic DBR1.
+          </p>
+          <p>
+            Perfect for players who love high-speed action and classic car
+            elegance.
+          </p>
+        </div>
+        <img class="voiture" src="assets/Group 185.png" alt="" />
+      </div>
+    </div>
+    <section class="alignement-niveaux">
+      <div class="niveaux">
+        <button><img src="assets/AAAvec1.svg" alt="" />Level 1</button
+        ><button><img src="assets/AAAvec2.svg" alt="" />Level 2</button
+        ><button><img src="assets/AAAvec3.svg" alt="" />Level 3</button>
+      </div>
+    </section>
   </body>
 
   <style>
-    .container {
+    button,
+    input[type="submit"],
+    input[type="reset"] {
+      background: none;
+      color: inherit;
+      border: none;
+      padding: 0;
+      font: inherit;
+      cursor: pointer;
+      outline: inherit;
+    }
+    .alignement-niveaux {
+      display: flex;
+      width: 100%;
+      justify-content: center;
+      align-items: center;
+    }
+    .niveaux {
+      width: 40%;
+      display: flex;
+      justify-content: space-around;
+      margin-top: 50px;
+    }
+    button img {
+      width: 30px;
+    }
+    .niveaux button {
+      display: flex;
+      height: 50.807px;
+      padding: 0px 22.016px;
+      justify-content: center;
+      align-items: center;
+      gap: 9.315px;
+      border-radius: 53.347px;
+      background: #52755d;
+    }
+    button {
+      color: #fff;
+      font-family: "EuropaSH";
+      font-size: 16.936px;
+      font-style: normal;
+      font-weight: 500;
+      line-height: 75.414px; /* 445.299% */
+    }
+    .main-content {
+      display: flex;
+    }
+    h1 {
+      color: #fff;
+      font-family: "SofaChrome";
+      font-size: 76.079px;
+      font-style: normal;
+      font-weight: 400;
+      line-height: 83.264px; /* 109.444% */
+      margin-bottom: 20px;
+    }
+    .voiture {
+      width: 25%;
       position: absolute;
+      right: 0;
       bottom: 0;
-      left: 0;
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      grid-template-rows: 1fr 1fr 1fr;
-      width: 200px;
-      height: 200px;
-      visibility: hidden;
     }
-    .items-joystick {
-      background-color: #fff;
-      border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      z-index: 50;
+    body {
+      background-color: #11100f;
+      font-family: "EuropaSH";
+      padding-left: 110px;
+      padding-right: 110px;
     }
-    @media (max-width: 900px) {
-      .container {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        display: grid;
-        grid-template-columns: 1fr 1fr 1fr;
-        grid-template-rows: 1fr 1fr 1fr;
-        width: 200px;
-        height: 200px;
-        visibility: visible;
-      }
-      .items-joystick {
-        background-color: #fff;
-        border-radius: 50%;
-        width: 50px;
-        height: 50px;
-        z-index: 50;
-      }
-      #up {
-        grid-column: 2;
-        grid-row: 1;
-      }
-      #down {
-        grid-column: 2;
-        grid-row: 3;
-      }
-      #left {
-        grid-column: 1;
-        grid-row: 2;
-      }
-      #right {
-        grid-column: 3;
-        grid-row: 2;
-      }
+    .header img {
+      color: #fff;
+      font-family: Europa Grotesk SH;
+      font-size: 29.154px;
+      font-style: normal;
+      font-weight: 500;
+      line-height: 129.822px;
+    }
+    .header div {
+      color: #fff;
+      font-family: Europa Grotesk SH;
+      font-size: 29.154px;
+      font-style: normal;
+      font-weight: 500;
+      line-height: 129.822px; /* 445.299% */
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    @font-face {
+      font-family: "EuropaSH";
+      src: url(assets/font/EuropaGroteskSH-MedEx.otf) format("opentype");
+    }
+    @font-face {
+      font-family: "SofaChrome";
+      src: url(assets/font/sofachrome\ rg.otf) format("opentype");
+    }
+    @font-face {
+      font-family: "Poppins";
+      src: url(assets/font/Poppins-Regular.ttf) format("truetype");
+    }
+
+    .text {
+      display: flex;
+      flex-direction: column;
+      width: 50%;
+    }
+    p {
+      color: #fff;
+      font-family: Poppins;
+      font-size: 16px;
+      font-style: normal;
+      font-weight: 500;
+      line-height: 30px;
+      font-family: "Poppins";
+      text-wrap: balance;
     }
   </style>
 </html>
